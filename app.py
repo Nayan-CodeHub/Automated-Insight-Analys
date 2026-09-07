@@ -1,11 +1,13 @@
 import io
+import os
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 from analyst import (
     clean_data, detect_column_types, dataset_profile, analyze_correlations,
-    detect_outliers, perform_clustering, build_chart_specs, generate_insights
+    detect_outliers, perform_clustering, build_chart_specs, generate_insights,
+    build_cleaning_report, answer_data_question, generate_ai_summary
 )
 from charts import render_chart
 
@@ -20,6 +22,7 @@ load_styles()
 st.markdown(
     """
     <section class="hero-band">
+        <div class="creator-credit">Created by Tech Titans</div>
         <div class="hero-kicker">AUTOMATED ANALYTICS WORKSPACE</div>
         <h1>Insight <span>Analyst</span></h1>
         <p>Turn a raw spreadsheet into a living dashboard, clean dataset, and clear story.</p>
@@ -102,7 +105,31 @@ try:
         st.warning("The selected filters contain no rows. Adjust the filters to continue.")
         st.stop()
 
-    cleaned, cleaning_log = clean_data(filtered_raw, types)
+    with st.sidebar.expander("🧽 Cleaning options", expanded=True):
+        remove_duplicates = st.checkbox("Remove duplicate rows", value=True)
+        numeric_fill = st.selectbox("Numeric missing values", ["median", "mean", "leave unchanged"])
+        categorical_fill = st.selectbox("Categorical missing values", ["mode", "Unknown"])
+        date_fill = st.selectbox("Date missing values", ["median", "leave unchanged"])
+
+    with st.sidebar.expander("🤖 AI integration", expanded=False):
+        ai_api_key = st.text_input(
+            "OpenAI API key",
+            value=os.getenv("OPENAI_API_KEY", ""),
+            type="password",
+            help="Optional. Only dataset statistics and generated insights are sent.",
+        )
+        ai_model = st.selectbox("AI model", ["gpt-4o-mini", "gpt-4.1-mini"], key="ai_model")
+        st.caption("Without a key, the local AI assistant remains available.")
+
+    cleaned, cleaning_log = clean_data(
+        filtered_raw,
+        types,
+        remove_duplicates=remove_duplicates,
+        numeric_fill=numeric_fill,
+        categorical_fill=categorical_fill,
+        date_fill=date_fill,
+    )
+    cleaning_report = build_cleaning_report(filtered_raw, cleaned, types)
     profile = dataset_profile(cleaned, types)
     corr = analyze_correlations(cleaned, types)
     outliers = detect_outliers(cleaned, types)
@@ -110,14 +137,19 @@ try:
     chart_specs = build_chart_specs(cleaned, types)
     insights = generate_insights(cleaned, types, corr, outliers, clusters)
 
+    st.markdown(
+        '<div class="nav-label"><span class="eyebrow">WORKSPACE NAVIGATION</span>'
+        '<span>Select a view to explore your dataset</span></div>',
+        unsafe_allow_html=True,
+    )
+    tabs = st.tabs(["📊 Dashboard", "🤖 ML Insights", "🧹 Data Quality", "🔎 Data Preview", "🧽 Clean Data"])
+
     # KPI row
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Rows shown", f"{len(cleaned):,}", f"of {len(df_raw):,} uploaded")
     c2.metric("Columns", f"{len(cleaned.columns):,}")
     c3.metric("Missing cells", f"{int(cleaned.isna().sum().sum()):,}")
     c4.metric("Duplicate rows", f"{int(cleaned.duplicated().sum()):,}")
-
-    tabs = st.tabs(["📊 Dashboard", "🤖 ML & Insights", "🧹 Data Quality", "🔎 Data Preview"])
 
     with tabs[0]:
         st.markdown(
@@ -133,6 +165,44 @@ try:
                 st.warning(f"Could not render {spec['title']}: {exc}")
 
     with tabs[1]:
+        st.subheader("🧠 AI data assistant")
+        st.caption("Ask a question about the current cleaned dataset.")
+        question = st.selectbox(
+            "Choose a question",
+            [
+                "What is the dataset size?",
+                "Which numeric column has the highest average?",
+                "Which category appears most often?",
+                "Where are the missing values?",
+                "What should I investigate first?",
+            ],
+            key="ai_data_question",
+        )
+        st.info(answer_data_question(cleaned, types, question), icon="💬")
+
+        st.subheader("✨ AI executive summary")
+        st.caption("Generate a concise narrative from the calculated statistics and insights.")
+        if st.button("Generate AI summary", key="generate_ai_summary"):
+            summary, error = generate_ai_summary(
+                ai_api_key,
+                ai_model,
+                {
+                    "rows": len(cleaned),
+                    "columns": list(cleaned.columns),
+                    "column_types": types,
+                    "missing_cells": int(cleaned.isna().sum().sum()),
+                    "duplicate_rows": int(cleaned.duplicated().sum()),
+                },
+                insights,
+                cleaning_log,
+            )
+            if error:
+                st.warning(error)
+            else:
+                st.session_state["ai_summary"] = summary
+        if st.session_state.get("ai_summary"):
+            st.markdown(st.session_state["ai_summary"])
+
         st.subheader("💡 Key findings")
         if insights:
             for item in insights:
@@ -199,6 +269,45 @@ try:
         else:
             st.info(clusters["reason"])
 
+    with tabs[4]:
+        st.subheader("🧽 Where your data was cleaned")
+        st.caption("The report compares the uploaded data with the version used for analysis.")
+
+        removed_rows = len(filtered_raw) - len(cleaned)
+        missing_before = int(filtered_raw.isna().sum().sum())
+        missing_after = int(cleaned.isna().sum().sum())
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Source rows", f"{len(filtered_raw):,}")
+        c2.metric("Rows removed", f"{removed_rows:,}")
+        c3.metric("Missing cells filled", f"{max(0, missing_before - missing_after):,}")
+        c4.metric("Cleaned rows", f"{len(cleaned):,}")
+
+        if cleaning_log:
+            st.markdown("**Cleaning actions applied**")
+            for line in cleaning_log:
+                st.write("• " + line)
+        else:
+            st.success("No cleaning actions were necessary.")
+
+        st.markdown("**Column-level cleaning details**")
+        st.dataframe(cleaning_report, use_container_width=True, hide_index=True)
+
+        left, right = st.columns(2)
+        with left:
+            st.markdown("**Before cleaning**")
+            st.dataframe(filtered_raw.head(20), use_container_width=True, hide_index=True)
+        with right:
+            st.markdown("**After cleaning**")
+            st.dataframe(cleaned.head(20), use_container_width=True, hide_index=True)
+
+        st.download_button(
+            "⬇️ Download cleaned CSV",
+            cleaned.to_csv(index=False).encode("utf-8"),
+            "cleaned_dataset.csv",
+            "text/csv",
+            key="download_cleaned_csv_report",
+        )
+
     with tabs[2]:
         st.subheader("🧹 Automatic data cleaning")
         if cleaning_log:
@@ -222,7 +331,8 @@ try:
             "⬇️ Download cleaned CSV",
             cleaned.to_csv(index=False).encode("utf-8"),
             "cleaned_dataset.csv",
-            "text/csv"
+            "text/csv",
+            key="download_cleaned_csv_preview",
         )
 
 except Exception as exc:

@@ -8,11 +8,23 @@
     --background: #0b141b;
     --border: #2e4653;
     --orange: #fb923c;
+    --blue: #60a5fa;
+    --shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
 }
 
 .stApp {
-    background: radial-gradient(circle at top right, #17333b 0%, var(--background) 48%, #081016 100%);
+    background:
+        linear-gradient(rgba(45, 212, 191, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 212, 191, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at top right, #17333b 0%, var(--background) 48%, #081016 100%);
+    background-size: 42px 42px, 42px 42px, auto;
     color: var(--ink);
+}
+
+.main .block-container {
+    max-width: 1500px;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
 }
 
 .hero-band {
@@ -23,7 +35,8 @@
     border: 1px solid #2c5961;
     border-radius: 14px;
     background: linear-gradient(115deg, #132b36 0%, #173b43 58%, #263041 100%);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    box-shadow: var(--shadow);
+    animation: rise-in 600ms ease both;
 }
 
 .hero-band::after {
@@ -46,12 +59,22 @@
     letter-spacing: 0.16em;
 }
 
+.creator-credit {
+    margin-bottom: 0.55rem;
+    color: #fbbf24;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
 .hero-band h1 {
     margin: 0.35rem 0 0.45rem;
     color: var(--ink);
     font-size: clamp(2rem, 4vw, 3.6rem);
     letter-spacing: 0.01em;
     line-height: 1;
+    animation: reveal 700ms 100ms ease both;
 }
 
 .hero-band h1 span {
@@ -63,6 +86,7 @@
     margin: 0;
     color: #b8cbd5;
     font-size: 1rem;
+    animation: reveal 700ms 180ms ease both;
 }
 
 .hero-pills {
@@ -70,6 +94,7 @@
     flex-wrap: wrap;
     gap: 0.55rem;
     margin-top: 1.25rem;
+    animation: reveal 700ms 260ms ease both;
 }
 
 .hero-pills span,
@@ -80,6 +105,13 @@
     color: #b8f3e9;
     background: rgba(7, 24, 31, 0.28);
     font-size: 0.75rem;
+    transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.hero-pills span:hover {
+    border-color: var(--accent);
+    background: rgba(45, 212, 191, 0.13);
+    transform: translateY(-2px);
 }
 
 .dataset-strip {
@@ -92,6 +124,8 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     background: rgba(23, 35, 45, 0.76);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    animation: rise-in 650ms 120ms ease both;
 }
 
 .live-dot {
@@ -100,6 +134,7 @@
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 0 0.25rem rgba(45, 212, 191, 0.12);
+    animation: live-pulse 2s ease-in-out infinite;
 }
 
 .strip-muted { color: var(--muted); }
@@ -119,11 +154,27 @@
     font-size: 1.45rem;
 }
 
+.nav-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1.35rem 0 0.35rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    animation: reveal 500ms ease both;
+}
+
+.nav-label .eyebrow {
+    color: var(--ink);
+}
+
 .chart-count { color: var(--orange); border-color: rgba(251, 146, 60, 0.3); }
 
 [data-testid="stSidebar"] {
     background: #101d26;
     border-right: 1px solid var(--border);
+    animation: slide-in 500ms ease both;
 }
 
 [data-testid="stMetric"] {
@@ -133,7 +184,12 @@
     padding: 1rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     transition: transform 160ms ease, border-color 160ms ease;
+    animation: rise-in 550ms 180ms ease both;
 }
+
+[data-testid="stMetric"]:nth-child(2) { animation-delay: 240ms; }
+[data-testid="stMetric"]:nth-child(3) { animation-delay: 300ms; }
+[data-testid="stMetric"]:nth-child(4) { animation-delay: 360ms; }
 
 [data-testid="stMetric"]:hover {
     transform: translateY(-2px);
@@ -145,11 +201,25 @@
 }
 
 [data-baseweb="tab-list"] {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     gap: 0.35rem;
+    padding: 0.45rem 0;
+    background: rgba(11, 20, 27, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(46, 70, 83, 0.7);
 }
 
 [data-baseweb="tab"] {
     color: var(--muted);
+    border-radius: 7px 7px 0 0;
+    transition: color 180ms ease, background 180ms ease;
+}
+
+[data-baseweb="tab"]:hover {
+    color: var(--ink);
+    background: rgba(45, 212, 191, 0.07);
 }
 
 [aria-selected="true"][data-baseweb="tab"] {
@@ -161,6 +231,17 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: reveal 600ms ease both;
+}
+
+[data-testid="stPlotlyChart"],
+[data-testid="stVegaLiteChart"] {
+    animation: chart-reveal 700ms ease both;
+}
+
+[data-baseweb="tab-panel"] {
+    animation: panel-reveal 420ms ease both;
 }
 
 [data-testid="stExpander"] {
@@ -188,4 +269,54 @@ textarea,
     background: var(--accent-soft);
     border-color: var(--accent);
     color: var(--accent);
+}
+
+.stDownloadButton > button {
+    border-radius: 7px;
+    font-weight: 700;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.stDownloadButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(45, 212, 191, 0.14);
+}
+
+@keyframes rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes reveal {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in {
+    from { opacity: 0; transform: translateX(-14px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes chart-reveal {
+    from { opacity: 0; transform: scale(0.985) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes panel-reveal {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes live-pulse {
+    0%, 100% { box-shadow: 0 0 0 0.2rem rgba(45, 212, 191, 0.1); }
+    50% { box-shadow: 0 0 0 0.45rem rgba(45, 212, 191, 0.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+    }
 }

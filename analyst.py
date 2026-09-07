@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import json
+import urllib.error
+import urllib.request
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
@@ -39,42 +42,79 @@ def detect_column_types(df):
         types[col] = "categorical"
     return types
 
-def clean_data(df, types):
+def clean_data(
+    df,
+    types,
+    remove_duplicates=True,
+    numeric_fill="median",
+    categorical_fill="mode",
+    date_fill="median",
+):
     out = df.copy()
     log = []
 
-    before = len(out)
-    out = out.drop_duplicates()
-    if len(out) < before:
-        log.append(f"Removed {before-len(out):,} duplicate rows.")
+    if remove_duplicates:
+        before = len(out)
+        out = out.drop_duplicates()
+        if len(out) < before:
+            log.append(f"Removed {before-len(out):,} duplicate rows.")
+    else:
+        log.append("Duplicate rows were preserved by the selected cleaning options.")
 
     for col, kind in types.items():
         if kind == "date":
             out[col] = _date_values(out[col])
             miss = int(out[col].isna().sum())
-            if miss:
+            if miss and date_fill == "median":
                 fill = out[col].dropna().median()
                 out[col] = out[col].fillna(fill)
                 log.append(f"{col}: parsed as date and filled {miss:,} missing values with the median date.")
+            elif miss:
+                log.append(f"{col}: parsed as date and left {miss:,} missing values unchanged.")
 
         elif kind == "numeric":
             out[col] = _numeric_values(out[col])
             miss = int(out[col].isna().sum())
-            if miss:
-                med = out[col].median()
-                out[col] = out[col].fillna(med)
-                log.append(f"{col}: filled {miss:,} missing numeric values with median ({med:.2f}).")
+            if miss and numeric_fill == "median":
+                fill = out[col].median()
+                out[col] = out[col].fillna(fill)
+                log.append(f"{col}: filled {miss:,} missing numeric values with median ({fill:.2f}).")
+            elif miss and numeric_fill == "mean":
+                fill = out[col].mean()
+                out[col] = out[col].fillna(fill)
+                log.append(f"{col}: filled {miss:,} missing numeric values with mean ({fill:.2f}).")
+            elif miss:
+                log.append(f"{col}: left {miss:,} missing numeric values unchanged.")
 
         else:
             out[col] = out[col].astype("string").str.strip()
             miss = int(out[col].isna().sum())
-            if miss:
+            if miss and categorical_fill == "mode":
                 mode = out[col].mode(dropna=True)
                 fill = mode.iloc[0] if not mode.empty else "Unknown"
                 out[col] = out[col].fillna(fill)
                 log.append(f"{col}: filled {miss:,} missing categorical values with '{fill}'.")
+            elif miss:
+                out[col] = out[col].fillna("Unknown")
+                log.append(f"{col}: filled {miss:,} missing categorical values with 'Unknown'.")
 
     return out, log
+
+def build_cleaning_report(raw, cleaned, types):
+    rows = []
+    for col, kind in types.items():
+        raw_missing = int(raw[col].isna().sum())
+        cleaned_missing = int(cleaned[col].isna().sum())
+        converted = kind in ("numeric", "date") and raw[col].dtype != cleaned[col].dtype
+        rows.append({
+            "Column": col,
+            "Detected type": kind,
+            "Missing before": raw_missing,
+            "Missing after": cleaned_missing,
+            "Values filled": max(0, raw_missing - cleaned_missing),
+            "Type normalized": "Yes" if converted else "No",
+        })
+    return pd.DataFrame(rows)
 
 def dataset_profile(df, types):
     rows = []
@@ -203,3 +243,89 @@ def generate_insights(df, types, corr, outliers, clusters):
         insights.append(f"K-Means found {clusters['n_clusters']} groups from the numeric features, useful for segmenting similar records.")
 
     return insights
+
+def answer_data_question(df, types, question):
+    numeric = [column for column, kind in types.items() if kind == "numeric"]
+    categorical = [column for column, kind in types.items() if kind == "categorical"]
+
+    if question == "What is the dataset size?":
+        return f"Your dataset contains {len(df):,} rows and {len(df.columns):,} columns."
+
+    if question == "Which numeric column has the highest average?":
+        if not numeric:
+            return "There are no numeric columns available for this question."
+        averages = df[numeric].mean().sort_values(ascending=False)
+        column = averages.index[0]
+        return f"{column} has the highest average value at {averages.iloc[0]:,.2f}."
+
+    if question == "Which category appears most often?":
+        if not categorical:
+            return "There are no categorical columns available for this question."
+        column = categorical[0]
+        value = df[column].value_counts(dropna=False).index[0]
+        count = int(df[column].value_counts(dropna=False).iloc[0])
+        return f"The most common value is '{value}' in {column}, appearing {count:,} times."
+
+    if question == "Where are the missing values?":
+        missing = df.isna().sum().sort_values(ascending=False)
+        missing = missing[missing > 0]
+        if missing.empty:
+            return "There are no missing values in the current dataset view."
+        details = ", ".join(f"{column} ({count:,})" for column, count in missing.items())
+        return f"Missing values were found in: {details}."
+
+    if question == "What should I investigate first?":
+        missing_total = int(df.isna().sum().sum())
+        duplicate_total = int(df.duplicated().sum())
+        if missing_total:
+            return f"Start with missing values. There are {missing_total:,} missing cells that may affect analysis."
+        if duplicate_total:
+            return f"Start with duplicate records. There are {duplicate_total:,} duplicate rows in the current view."
+        if numeric:
+            return f"Start by exploring the distribution and outliers in '{numeric[0]}'."
+        return "The dataset is clean enough to begin exploring category patterns."
+
+    return "Choose a question to analyze the current dataset."
+
+def generate_ai_summary(api_key, model, dataset_summary, insights, cleaning_log):
+    if not api_key:
+        return None, "Add an OpenAI API key to generate an AI narrative."
+
+    prompt = {
+        "dataset": dataset_summary,
+        "automatic_insights": insights,
+        "cleaning_actions": cleaning_log,
+        "instructions": (
+            "Write a concise executive summary for a business analyst. "
+            "Use three headings: What stands out, Data quality, Recommended next steps. "
+            "Use only the supplied facts. Do not invent causes, predictions, or numbers."
+        ),
+    }
+    payload = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You are a careful data analyst."},
+            {"role": "user", "content": json.dumps(prompt, default=str)},
+        ],
+        "temperature": 0.2,
+        "max_tokens": 500,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        "https://api.openai.com/v1/chat/completions",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        return result["choices"][0]["message"]["content"].strip(), None
+    except urllib.error.HTTPError as exc:
+        return None, f"AI provider error ({exc.code}). Check the API key and model name."
+    except (urllib.error.URLError, TimeoutError):
+        return None, "The AI provider could not be reached. Check your internet connection."
+    except (KeyError, IndexError, json.JSONDecodeError):
+        return None, "The AI provider returned an unexpected response."

@@ -24,6 +24,8 @@ An end-to-end AI/ML-style analytics dashboard for the Datathon problem statement
 - Automatic chart selection
 - Interactive Plotly dashboard
 - Plain-language findings
+- Local AI data assistant with dataset questions
+- Optional OpenAI executive summary integration
 - Download cleaned dataset
 - Works with unseen datasets without changing column names in code
 
@@ -62,6 +64,17 @@ python -m streamlit run app.py
 
 The browser will open the dashboard.
 
+### Optional AI integration
+
+The dashboard works without an API key. To enable AI-generated executive summaries, set an OpenAI key before starting Streamlit:
+
+```powershell
+$env:OPENAI_API_KEY = "your-api-key"
+python -m streamlit run app.py
+```
+
+You can also enter the key in the sidebar under **AI integration**. Only calculated dataset statistics, cleaning actions, and generated insights are sent to the provider; the uploaded file itself is not sent.
+
 ## Project structure
 
 ```text
@@ -94,7 +107,6 @@ The system deliberately avoids hard-coding names such as `Sales`, `Region`, or `
 ## Future upgrades
 
 For an advanced version, add:
-- LLM-powered narrative generation
 - Automatic target-column detection
 - More clustering algorithms
 - Forecasting
