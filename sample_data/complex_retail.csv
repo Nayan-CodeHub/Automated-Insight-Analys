@@ -1,0 +1,32 @@
+Order Date,Customer Segment,Product Line,Region,Units Sold,Revenue,Discount,Customer Rating,Returned,Delivery Days,Payment Method
+2026-06-01,Enterprise,Office Tech,North,14,"$12,480.00",5.0%,4.8,No,3,Card
+2026-06-03,Consumer,Home Goods,West,8,"$2,950.00",10.0%,4.2,No,5,Wallet
+2026-06-05,Small Business,Outdoor,South,21,"$8,640.00",7.5%,4.5,No,4,Card
+2026-06-07,Consumer,Apparel,East,32,"$4,120.00",15.0%,3.9,Yes,7,Wallet
+2026-06-09,Enterprise,Office Tech,West,18,"$15,300.00",5.0%,4.9,No,2,Invoice
+2026-06-11,Small Business,Home Goods,North,11,"$3,870.00",8.0%,4.1,No,4,Card
+2026-06-13,Consumer,Outdoor,East,16,"$6,240.00",12.5%,4.4,No,5,Wallet
+2026-06-15,Enterprise,Apparel,South,27,"$9,180.00",10.0%,4.6,No,3,Invoice
+2026-06-17,Consumer,Office Tech,North,6,"$5,760.00",0.0%,4.0,No,2,Card
+2026-06-19,Small Business,Home Goods,West,19,"$6,430.00",7.5%,4.3,No,6,Card
+2026-06-21,Enterprise,Outdoor,East,24,"$11,520.00",5.0%,4.7,No,3,Invoice
+2026-06-23,Consumer,Apparel,North,41,"$5,330.00",20.0%,3.7,Yes,8,Wallet
+2026-06-25,Small Business,Office Tech,South,13,"$10,920.00",6.0%,4.5,No,4,Card
+2026-06-27,Enterprise,Home Goods,West,22,"$8,140.00",8.0%,4.8,No,2,Invoice
+2026-06-29,Consumer,Outdoor,North,9,"$3,480.00",12.5%,4.0,No,5,Wallet
+2026-07-01,Small Business,Apparel,East,28,"$7,280.00",15.0%,4.2,No,6,Card
+2026-07-03,Enterprise,Office Tech,South,31,"$24,800.00",5.0%,4.9,No,2,Invoice
+2026-07-05,Consumer,Home Goods,West,15,"$4,710.00",10.0%,4.1,No,5,Wallet
+2026-07-07,Small Business,Outdoor,North,17,"$7,055.00",7.5%,4.4,No,4,Card
+2026-07-09,Enterprise,Apparel,East,35,"$12,950.00",10.0%,4.6,No,3,Invoice
+2026-07-11,Consumer,Office Tech,South,7,"$6,720.00",0.0%,3.8,Yes,9,Card
+2026-07-13,Small Business,Home Goods,West,23,"$7,820.00",8.0%,4.3,No,5,Card
+2026-07-15,Enterprise,Outdoor,North,26,"$13,260.00",5.0%,4.8,No,2,Invoice
+2026-07-17,Consumer,Apparel,East,38,"$4,940.00",20.0%,3.6,Yes,10,Wallet
+2026-07-19,Small Business,Office Tech,South,12,"$9,840.00",6.0%,4.5,No,4,Card
+2026-07-21,Enterprise,Home Goods,West,20,"$7,400.00",8.0%,4.7,No,3,Invoice
+2026-07-23,Consumer,Outdoor,North,10,"$3,900.00",12.5%,,No,5,Wallet
+2026-07-25,Small Business,Apparel,East,30,"$7,800.00",15.0%,4.1,No,6,Card
+2026-07-27,Enterprise,Office Tech,South,29,"$23,200.00",5.0%,4.9,No,2,Invoice
+2026-07-29,Consumer,Home Goods,West,16,"$5,024.00",10.0%,4.0,No,5,Wallet
+2026-07-29,Consumer,Home Goods,West,16,"$5,024.00",10.0%,4.0,No,5,Wallet

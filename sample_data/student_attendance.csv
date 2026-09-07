@@ -1,0 +1,35 @@
+Attendance Date,Student ID,Student Name,Department,Class,Status,Attendance Rate,Late Minutes
+2026-08-01,STU-001,nayan,Computer Science,Data Structures,Present,95%,0
+2026-08-01,STU-002,yash,Computer Science,Data Structures,Present,92%,5
+2026-08-01,STU-003,satyam,Information Systems,Database Systems,Absent,78%,
+2026-08-01,STU-004,aaditya,Mechanical Engineering,Thermodynamics,Present,88%,0
+2026-08-02,STU-001,nayan,Computer Science,Web Development,Present,96%,0
+2026-08-02,STU-002,yash,Computer Science,Web Development,Late,91%,12
+2026-08-02,STU-003,satyam,Information Systems,Web Development,Present,80%,3
+2026-08-02,STU-004,aaditya,Mechanical Engineering,Machine Design,Absent,86%,
+2026/08/03,STU-005,asmita,Electronics,Digital Logic,Present,94%,0
+2026/08/03,STU-006,chirag,Electronics,Digital Logic,Present,"89.5%",7
+2026/08/03,STU-007,himanshu,Information Systems,Database Systems,Present,93%,0
+2026/08/03,STU-008,meet,Mechanical Engineering,Thermodynamics,Late,82%,15
+2026-08-04,STU-005,asmita,Electronics,Embedded Systems,Absent,90%,
+2026-08-04,STU-006,chirag,Electronics,Embedded Systems,Present,91%,0
+2026-08-04,STU-007,himanshu,Information Systems,Network Security,Present,94%,2
+2026-08-04,STU-008,meet,Mechanical Engineering,Machine Design,Present,84%,0
+2026-08-05,STU-001,nayan,Computer Science,Algorithms,Present,97%,0
+2026-08-05,STU-002,yash,Computer Science,Algorithms,Absent,88%,
+2026-08-05,STU-003,satyam,Information Systems,Network Security,Present,81%,4
+2026-08-05,STU-004,aaditya,Mechanical Engineering,Machine Design,Present,87%,0
+2026-08-06,STU-005,asmita,Electronics,Signals,Present,92%,0
+2026-08-06,STU-006,chirag,Electronics,Signals,Late,90%,"1,0"
+2026-08-06,STU-007,himanshu,Information Systems,Network Security,Present,95%,0
+2026-08-06,STU-008,meet,Mechanical Engineering,Machine Design,Present,85%,0
+2026-08-07,STU-001,nayan,Computer Science,Algorithms,Present,98%,0
+2026-08-07,STU-002,yash,Computer Science,Algorithms,Present,93%,0
+2026-08-07,STU-003,satyam,Information Systems,Database Systems,,83%,5
+2026-08-07,STU-004,aaditya,Mechanical Engineering,Thermodynamics,Present,89%,0
+2026-08-08,STU-005,asmita,Electronics,Signals,Present,93%,0
+2026-08-08,STU-006,chirag,Electronics,Signals,Present,91%,0
+2026-08-08,STU-007,himanshu,Information Systems,Network Security,Present,96%,0
+2026-08-08,STU-008,meet,Mechanical Engineering,Thermodynamics,Present,86%,0
+2026-08-08,STU-009,parth,Computer Science,Data Structures,Present,90%,0
+2026-08-08,STU-007,himanshu,Information Systems,Network Security,Present,96%,0
