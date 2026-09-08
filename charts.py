@@ -34,4 +34,4 @@ def render_chart(df, spec):
         xaxis={"gridcolor": "#2e4653", "zerolinecolor": "#2e4653"},
         yaxis={"gridcolor": "#2e4653", "zerolinecolor": "#2e4653"},
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")

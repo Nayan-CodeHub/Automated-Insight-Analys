@@ -245,15 +245,15 @@ try:
                 st.success(f"All students are at or above the {threshold}% threshold.")
             else:
                 st.warning(f"{len(flagged)} student(s) are below the {threshold}% attendance threshold.")
-                st.dataframe(flagged, use_container_width=True, hide_index=True)
+                st.dataframe(flagged, width="stretch", hide_index=True)
             st.caption(f"Ranking based on average {attendance_column} by {student_column}.")
-            st.dataframe(ranking, use_container_width=True, hide_index=True)
+            st.dataframe(ranking, width="stretch", hide_index=True)
 
         st.subheader("🔗 Correlations")
         if corr.empty:
             st.info("At least two numeric columns are required for correlation analysis.")
         else:
-            st.dataframe(corr, use_container_width=True, hide_index=True)
+            st.dataframe(corr, width="stretch", hide_index=True)
 
         st.subheader("🚨 Outlier detection")
         if outliers:
@@ -265,7 +265,7 @@ try:
         st.subheader("👥 Clustering")
         if clusters["available"]:
             st.write(f"Detected **{clusters['n_clusters']}** groups using K-Means.")
-            st.dataframe(clusters["summary"], use_container_width=True)
+            st.dataframe(clusters["summary"], width="stretch")
         else:
             st.info(clusters["reason"])
 
@@ -290,15 +290,15 @@ try:
             st.success("No cleaning actions were necessary.")
 
         st.markdown("**Column-level cleaning details**")
-        st.dataframe(cleaning_report, use_container_width=True, hide_index=True)
+        st.dataframe(cleaning_report, width="stretch", hide_index=True)
 
         left, right = st.columns(2)
         with left:
             st.markdown("**Before cleaning**")
-            st.dataframe(filtered_raw.head(20), use_container_width=True, hide_index=True)
+            st.dataframe(filtered_raw.head(20), width="stretch", hide_index=True)
         with right:
             st.markdown("**After cleaning**")
-            st.dataframe(cleaned.head(20), use_container_width=True, hide_index=True)
+            st.dataframe(cleaned.head(20), width="stretch", hide_index=True)
 
         st.download_button(
             "⬇️ Download cleaned CSV",
@@ -319,14 +319,14 @@ try:
         st.dataframe(pd.DataFrame({
             "Column": list(types.keys()),
             "Detected Type": list(types.values())
-        }), use_container_width=True, hide_index=True)
+        }), width="stretch", hide_index=True)
 
         st.subheader("Column profile")
-        st.dataframe(profile, use_container_width=True, hide_index=True)
+        st.dataframe(profile, width="stretch", hide_index=True)
 
     with tabs[3]:
         st.subheader("Cleaned data")
-        st.dataframe(cleaned.head(100), use_container_width=True, hide_index=True)
+        st.dataframe(cleaned.head(100), width="stretch", hide_index=True)
         st.download_button(
             "⬇️ Download cleaned CSV",
             cleaned.to_csv(index=False).encode("utf-8"),
